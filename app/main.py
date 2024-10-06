@@ -21,8 +21,10 @@ def main():
     if file_contents:
         output = ""
         for letter in file_contents:
-            output += scanner(letter)
+            if letter not in ["\n"]:
+                output += scanner(letter)
         output += "EOF  null"
+        print(output)
     else:
         print(
             "EOF  null"
