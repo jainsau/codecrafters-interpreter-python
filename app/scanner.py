@@ -1,26 +1,26 @@
 def scanner(c: str) -> str:
     match c:
         case "(":
-            return "LEFT_PAREN ( null\n"
+            return "LEFT_PAREN ( null\n", ""
         case ")":
-            return "RIGHT_PAREN ) null\n"
+            return "RIGHT_PAREN ) null\n", ""
         case "{":
-            return "LEFT_BRACE { null\n"
+            return "LEFT_BRACE { null\n", ""
         case "}":
-            return "RIGHT_BRACE } null\n"
+            return "RIGHT_BRACE } null\n", ""
         case ",":
-            return "COMMA , null\n"
+            return "COMMA , null\n", ""
         case ".":
-            return "DOT . null\n"
+            return "DOT . null\n", ""
         case "-":
-            return "MINUS - null\n"
+            return "MINUS - null\n", ""
         case "+":
-            return "PLUS + null\n"
+            return "PLUS + null\n", ""
         case ";":
-            return "SEMICOLON ; null\n"
+            return "SEMICOLON ; null\n", ""
         case "/":
-            return "SLASH / null\n"
+            return "SLASH / null\n", ""
         case "*":
-            return "STAR * null\n"
-
-    raise NotImplementedError("Unrecognized token")
+            return "STAR * null\n", ""
+        case _:
+            return "", f"Error: Unexpected character: {c}\n"
