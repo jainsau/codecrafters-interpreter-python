@@ -20,9 +20,9 @@ def main():
     # Uncomment this block to pass the first stage
     if file_contents:
         output = ""
-        for letter in file_contents:
-            if letter not in ["\n"]:
-                output += scanner(letter)
+        for token in file_contents:
+            if token not in ["\n"]:
+                output += scanner(token)
         output += "EOF  null"
         print(output)
     else:
