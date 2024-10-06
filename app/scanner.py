@@ -9,18 +9,18 @@ def scanner(c: str) -> str:
         case "}":
             return "RIGHT_BRACE } null\n"
         case ",":
-            return "COMMA , null"
+            return "COMMA , null\n"
         case ".":
-            return "DOT . null"
+            return "DOT . null\n"
         case "-":
-            return "MINUS - null"
+            return "MINUS - null\n"
         case "+":
-            return "PLUS + null"
+            return "PLUS + null\n"
         case ";":
-            return "SEMICOLON ; null"
+            return "SEMICOLON ; null\n"
         case "/":
-            return "SLASH / null"
+            return "SLASH / null\n"
         case "*":
-            return "STAR * null"
+            return "STAR * null\n"
 
     raise NotImplementedError("Unrecognized token")
