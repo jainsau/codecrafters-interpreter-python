@@ -19,17 +19,19 @@ def main():
 
     # Uncomment this block to pass the first stage
     if file_contents:
-        line, output, errors = 0, "", ""
+        line, output, errors = 1, "", ""
         for token in file_contents:
             if token == "\n":
                 line += 1
             else:
                 res, err = scanner(token)
                 output = output + res if res != "" else output
-                errors = errors + f"[line {line}] err" if err != "" else errors
+                errors = errors + f"[line {line}] {err}" if err != "" else errors
         output += "EOF  null"
         print(errors, file=sys.stderr)
         print(output)
+        if errors != "":
+            exit(65)
     else:
         print(
             "EOF  null"
