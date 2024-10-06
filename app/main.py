@@ -1,4 +1,5 @@
 import sys
+from scanner import scanner
 
 
 def main():
@@ -18,7 +19,10 @@ def main():
 
     # Uncomment this block to pass the first stage
     if file_contents:
-        raise NotImplementedError("Scanner not implemented")
+        output = ""
+        for letter in file_contents:
+            output += scanner(letter)
+        output += "EOF  null"
     else:
         print(
             "EOF  null"
