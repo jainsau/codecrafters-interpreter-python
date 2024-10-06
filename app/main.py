@@ -1,5 +1,5 @@
 import sys
-from scanner import scanner
+from app.scanner import scanner
 
 
 def main():
