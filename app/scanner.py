@@ -30,5 +30,13 @@ def scanner(c: str) -> str:
             return "BANG ! null\n", ""
         case "!=":
             return "BANG_EQUAL != null\n", ""
+        case "<":
+            return "LESS < null\n", ""
+        case ">":
+            return "GREATER > null\n", ""
+        case "<=":
+            return "LESS_EQUAL <= null\n", ""
+        case ">=":
+            return "GREATER_EQUAL >= null\n", ""
         case _:
             return "", f"Error: Unexpected character: {c}\n"
