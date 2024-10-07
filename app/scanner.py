@@ -26,5 +26,9 @@ def scanner(c: str) -> str:
             return "EQUAL = null\n", ""
         case "==":
             return "EQUAL_EQUAL == null\n", ""
+        case "!":
+            return "BANG ! null\n", ""
+        case "!=":
+            return "BANG_EQUAL != null\n", ""
         case _:
             return "", f"Error: Unexpected character: {c}\n"
