@@ -20,13 +20,26 @@ def main():
     # Uncomment this block to pass the first stage
     if file_contents:
         line, output, errors = 1, "", ""
-        for token in file_contents:
+        i = 0
+        while i < len(file_contents):
+            token = file_contents[i]
+            # for token in file_contents:
             if token == "\n":
                 line += 1
+            elif (
+                token == "="
+                and (i + 1) < len(file_contents)
+                and file_contents[i : i + 2] == "=="
+            ):
+                res, _ = scanner(file_contents[i : i + 2])
+                output = output + res if res != "" else output
+                i += 2
+                continue
             else:
                 res, err = scanner(token)
                 output = output + res if res != "" else output
                 errors = errors + f"[line {line}] {err}" if err != "" else errors
+            i += 1
         output += "EOF  null"
         print(errors, file=sys.stderr)
         print(output)
