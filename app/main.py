@@ -34,7 +34,9 @@ def main():
                 i += 2
                 continue
             elif (i + 1) < len(file_contents) and file_contents[i : i + 2] == "//":
-                break
+                while i < len(file_contents) and file_contents[i] != "\n":
+                    i += 1
+                line += 1
             elif token == "\n":
                 line += 1
             elif token in [" ", "\t"]:
