@@ -41,6 +41,21 @@ def main():
                 line += 1
             elif token in [" ", "\t"]:
                 pass
+            elif token == '"':
+                res, err = "", ""
+                i += 1
+                while True:
+                    if i == len(file_contents) or file_contents[i] == "\n":
+                        res, err = "", f"[line {line}] Error: Unterminated string.\n"
+                        line += 1
+                        break
+                    elif file_contents[i] == '"':
+                        break
+                    else:
+                        res += file_contents[i]
+                    i += 1
+                errors += err
+                output = output + f'STRING "{res}" {res}\n' if res != "" else output
             else:
                 res, err = scanner(token)
                 output = output + res if res != "" else output
