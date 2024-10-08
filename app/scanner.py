@@ -38,5 +38,7 @@ def scanner(c: str) -> str:
             return "LESS_EQUAL <= null\n", ""
         case ">=":
             return "GREATER_EQUAL >= null\n", ""
+        case "/":
+            return "SLASH / null\n", ""
         case _:
             return "", f"Error: Unexpected character: {c}\n"

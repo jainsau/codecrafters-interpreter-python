@@ -33,26 +33,10 @@ def main():
                 output = output + res if res != "" else output
                 i += 2
                 continue
+            elif (i + 1) < len(file_contents) and file_contents[i : i + 2] == "//":
+                break
             elif token == "\n":
                 line += 1
-            # elif (
-            #     token == "="
-            #     and (i + 1) < len(file_contents)
-            #     and file_contents[i : i + 2] == "=="
-            # ):
-            #     res, _ = scanner(file_contents[i : i + 2])
-            #     output = output + res if res != "" else output
-            #     i += 2
-            #     continue
-            # elif (
-            #     token == "!"
-            #     and (i + 1) < len(file_contents)
-            #     and file_contents[i : i + 2] == "!="
-            # ):
-            #     res, _ = scanner(file_contents[i : i + 2])
-            #     output = output + res if res != "" else output
-            #     i += 2
-            #     continue
             else:
                 res, err = scanner(token)
                 output = output + res if res != "" else output
