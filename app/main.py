@@ -37,6 +37,8 @@ def main():
                 break
             elif token == "\n":
                 line += 1
+            elif token in [" ", "\t"]:
+                pass
             else:
                 res, err = scanner(token)
                 output = output + res if res != "" else output
