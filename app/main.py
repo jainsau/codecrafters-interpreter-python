@@ -1,4 +1,5 @@
 import sys
+import re
 from app.scanner import scanner
 
 
@@ -75,6 +76,11 @@ def main():
                     output = output + f"NUMBER {res_} {res}\n"
                 else:
                     output = output + f"NUMBER {res} {res}.0\n"
+                continue
+            elif re.search("[A-z_]", token):
+                res = re.search("^[A-z_][A-z_0-9]*", file_contents[i:]).group()
+                output += f"IDENTIFIER {res} null\n"
+                i += len(res)
                 continue
             else:
                 res, err = scanner(token)
