@@ -56,6 +56,26 @@ def main():
                     i += 1
                 errors += err
                 output = output + f'STRING "{res}" {res}\n' if res != "" else output
+            elif token in "0123456789":
+                res = token
+                i += 1
+                while i < len(file_contents):
+                    if file_contents[i] in ".0123456789":
+                        res += file_contents[i]
+                    else:
+                        break
+                    i += 1
+                if "." in res:
+                    res_ = res
+                    # drop extra zeros past decimal
+                    while res.endswith("0"):
+                        res = res[:-1]
+                    if res.endswith("."):
+                        res += "0"
+                    output = output + f"NUMBER {res_} {res}\n"
+                else:
+                    output = output + f"NUMBER {res} {res}.0\n"
+                continue
             else:
                 res, err = scanner(token)
                 output = output + res if res != "" else output
