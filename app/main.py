@@ -79,7 +79,28 @@ def main():
                 continue
             elif re.search("[A-z_]", token):
                 res = re.search("^[A-z_][A-z_0-9]*", file_contents[i:]).group()
-                output += f"IDENTIFIER {res} null\n"
+                if res in [
+                    "and",
+                    "class",
+                    "else",
+                    "false",
+                    "for",
+                    "fun",
+                    "if",
+                    "nil",
+                    "or",
+                    "print",
+                    "return",
+                    "super",
+                    "this",
+                    "true",
+                    "var",
+                    "while",
+                ]:
+                    res_ = res.upper()
+                    output += f"{res_} {res} null\n"
+                else:
+                    output += f"IDENTIFIER {res} null\n"
                 i += len(res)
                 continue
             else:
