@@ -29,7 +29,7 @@ def main():
                 exit(65)
         else:
             for token in tokens:
-                print(token.lexeme)
+                print(token.literal if token.literal else token.lexeme)
     else:
         print("EOF  null")
 
