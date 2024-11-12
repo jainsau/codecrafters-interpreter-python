@@ -1,28 +1,35 @@
 import sys
-from app.scanner import tokenize
+import argparse
+from app.scanner import Scanner
 
 
 def main():
-    if len(sys.argv) < 3:
-        print("Usage: ./your_program.sh tokenize <filename>", file=sys.stderr)
-        exit(1)
+    # Create the parser
+    parser = argparse.ArgumentParser(description="Lox parser")
 
-    command = sys.argv[1]
-    filename = sys.argv[2]
+    # Add arguments
+    parser.add_argument("command", choices=["tokenize", "parse"], help="Command")
+    parser.add_argument("filename", type=str, help="Sourcefile")
 
-    if command != "tokenize":
-        print(f"Unknown command: {command}", file=sys.stderr)
-        exit(1)
+    # Parse arguments
+    args = parser.parse_args()
 
-    with open(filename) as file:
+    with open(args.filename) as file:
         file_contents = file.read()
 
     if file_contents:
-        output, errors = tokenize(file_contents)
-        print(errors, file=sys.stderr)
-        print(output)
-        if errors != "":
-            exit(65)
+        s = Scanner(file_contents)
+        tokens, errors = s.tokens
+        if args.command == "tokenize":
+            for token in tokens:
+                print(token)
+            for error in errors:
+                print(error, file=sys.stderr)
+            if errors:
+                exit(65)
+        else:
+            for token in tokens:
+                print(token.lexeme)
     else:
         print("EOF  null")
 
