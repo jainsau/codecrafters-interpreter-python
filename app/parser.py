@@ -16,7 +16,21 @@ class Parser:
             return None
 
     def expression(self) -> Expr:
-        return self.comparison()
+        return self.equality()
+
+    def equality(self) -> Expr:
+        expr = self.comparison()
+
+        while self.current_token and self.current_token.type in [
+            ValidTokenType.BANG_EQUAL,
+            ValidTokenType.EQUAL_EQUAL,
+        ]:
+            operator = self.current_token
+            self.cursor += 1
+            right = self.comparison()
+            expr = Binary(expr, operator, right)
+
+        return expr
 
     def comparison(self) -> Expr:
         expr = self.term()
