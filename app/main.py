@@ -1,6 +1,8 @@
 import sys
 import argparse
 from app.scanner import Scanner
+from app.parser import Parser
+from app.ast_printer import AstPrinter
 
 
 def main():
@@ -23,13 +25,15 @@ def main():
         if args.command == "tokenize":
             for token in tokens:
                 print(token)
+            print("EOF  null")
             for error in errors:
                 print(error, file=sys.stderr)
             if errors:
                 exit(65)
         else:
-            for token in tokens:
-                print(token.literal if token.literal else token.lexeme)
+            t = Parser(tokens)
+            p = AstPrinter()
+            print(p.print(t.expression()))
     else:
         print("EOF  null")
 

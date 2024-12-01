@@ -46,8 +46,6 @@ class ValidTokenType(Enum):
     TRUE = auto()
     VAR = auto()
     WHILE = auto()
-    # Convenience
-    EOF = auto()
 
 
 class WhiteTokenType(Enum):
@@ -236,5 +234,3 @@ class Scanner:
                 self._whites.append(token)
 
             i += len(token.lexeme)
-
-        self._tokens.append(ValidToken(ValidTokenType.EOF, "", None, line + 1))
