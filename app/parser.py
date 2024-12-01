@@ -16,7 +16,21 @@ class Parser:
             return None
 
     def expression(self) -> Expr:
-        return self.factor()
+        return self.term()
+
+    def term(self) -> Expr:
+        expr = self.factor()
+
+        while self.current_token and self.current_token.type in [
+            ValidTokenType.MINUS,
+            ValidTokenType.PLUS,
+        ]:
+            operator = self.current_token
+            self.cursor += 1
+            right = self.factor()
+            expr = Binary(expr, operator, right)
+
+        return expr
 
     def factor(self) -> Expr:
         expr = self.unary()
