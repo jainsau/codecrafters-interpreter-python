@@ -1,3 +1,4 @@
+from .scanner import ValidToken
 import abc
 from typing import TypeVar, Protocol
 
@@ -30,3 +31,12 @@ class Literal(Expr):
 
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_literal_expr(self)
+
+
+class Unary(Expr):
+    def __init__(self, operator: ValidToken, right: Expr):
+        self.operator = operator
+        self.right = right
+
+    def accept(self, visitor: Visitor[T]) -> T:
+        return visitor.visit_unary_expr(self)

@@ -1,5 +1,5 @@
 from .scanner import ValidToken, ValidTokenType
-from .expr import Expr, Literal, Grouping
+from .expr import Expr, Unary, Literal, Grouping
 from typing import List
 
 
@@ -13,6 +13,18 @@ class Parser:
         return self.tokens[self.cursor]
 
     def expression(self) -> Expr:
+        return self.unary()
+
+    def unary(self) -> Expr:
+        if self.current_token.type in [
+            ValidTokenType.BANG,
+            ValidTokenType.MINUS,
+        ]:
+            operator = self.current_token
+            self.cursor += 1
+            right = self.unary()
+            return Unary(operator, right)
+
         return self.primary()
 
     def primary(self) -> Expr:

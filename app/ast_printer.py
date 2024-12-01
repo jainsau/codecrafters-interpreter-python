@@ -3,6 +3,7 @@ from .expr import (
     Expr,
     Grouping,
     Literal,
+    Unary,
 )
 from typing import List
 
@@ -20,3 +21,6 @@ class AstPrinter(Visitor):
 
     def visit_literal_expr(self, expr: Literal) -> str:
         return expr.value if expr.value else "nil"
+
+    def visit_unary_expr(self, expr: Unary) -> str:
+        return self._parenthesize(expr.operator.lexeme, expr.right)
