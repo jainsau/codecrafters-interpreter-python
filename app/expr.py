@@ -17,6 +17,16 @@ class Visitor(Protocol[T]):
     def visit_literal_expr(self, expr: "Literal") -> T: ...
 
 
+class Binary(Expr):
+    def __init__(self, left: Expr, operator: ValidToken, right: Expr):
+        self.left = left
+        self.operator = operator
+        self.right = right
+
+    def accept(self, visitor: Visitor[T]) -> T:
+        return visitor.visit_binary_expr(self)
+
+
 class Grouping(Expr):
     def __init__(self, expression: Expr):
         self.expression = expression

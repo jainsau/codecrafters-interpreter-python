@@ -1,6 +1,7 @@
 from .expr import (
     Visitor,
     Expr,
+    Binary,
     Grouping,
     Literal,
     Unary,
@@ -15,6 +16,9 @@ class AstPrinter(Visitor):
     def _parenthesize(self, name: str, *exprs: List[Expr]) -> str:
         group = [name] + [expr.accept(self) for expr in exprs]
         return f'({" ".join(group)})'
+
+    def visit_binary_expr(self, expr: Binary) -> str:
+        return self._parenthesize(expr.operator.lexeme, expr.left, expr.right)
 
     def visit_grouping_expr(self, expr: Grouping) -> str:
         return self._parenthesize("group", expr.expression)

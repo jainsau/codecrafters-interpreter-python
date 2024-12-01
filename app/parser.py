@@ -1,5 +1,5 @@
 from .scanner import ValidToken, ValidTokenType
-from .expr import Expr, Unary, Literal, Grouping
+from .expr import Expr, Binary, Unary, Literal, Grouping
 from typing import List
 
 
@@ -10,10 +10,27 @@ class Parser:
 
     @property
     def current_token(self):
-        return self.tokens[self.cursor]
+        try:
+            return self.tokens[self.cursor]
+        except IndexError:
+            return None
 
     def expression(self) -> Expr:
-        return self.unary()
+        return self.factor()
+
+    def factor(self) -> Expr:
+        expr = self.unary()
+
+        while self.current_token and self.current_token.type in [
+            ValidTokenType.SLASH,
+            ValidTokenType.STAR,
+        ]:
+            operator = self.current_token
+            self.cursor += 1
+            right = self.unary()
+            expr = Binary(expr, operator, right)
+
+        return expr
 
     def unary(self) -> Expr:
         if self.current_token.type in [
