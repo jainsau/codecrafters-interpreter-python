@@ -7,14 +7,14 @@ from app.ast_printer import AstPrinter
 
 def main():
     # Create the parser
-    parser = argparse.ArgumentParser(description="Lox parser")
+    ap = argparse.ArgumentParser(description="Lox parser")
 
     # Add arguments
-    parser.add_argument("command", choices=["tokenize", "parse"], help="Command")
-    parser.add_argument("filename", type=str, help="Sourcefile")
+    ap.add_argument("command", choices=["tokenize", "parse"], help="Command")
+    ap.add_argument("filename", type=str, help="Sourcefile")
 
     # Parse arguments
-    args = parser.parse_args()
+    args = ap.parse_args()
 
     with open(args.filename) as file:
         file_contents = file.read()
@@ -25,15 +25,17 @@ def main():
         if args.command == "tokenize":
             for token in tokens:
                 print(token)
-            print("EOF  null")
             for error in errors:
                 print(error, file=sys.stderr)
-            if errors:
-                exit(65)
         else:
-            t = Parser(tokens)
-            p = AstPrinter()
-            print(p.print(t.expression()))
+            p = Parser(tokens)
+            had_error, expr = p.parse()
+            if had_error:
+                exit(65)
+            if expr:
+                print(AstPrinter().print(expr))
+        if errors:
+            exit(65)
     else:
         print("EOF  null")
 

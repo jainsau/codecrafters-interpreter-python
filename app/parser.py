@@ -1,6 +1,10 @@
 from .scanner import ValidToken, ValidTokenType
 from .expr import Expr, Binary, Unary, Literal, Grouping
-from typing import List
+from typing import Tuple, List, Optional
+
+
+class ParseError(RuntimeError):
+    pass
 
 
 class Parser:
@@ -9,11 +13,26 @@ class Parser:
         self.cursor = 0
 
     @property
-    def current_token(self):
+    def current_token(self) -> Optional[ValidToken]:
         try:
             return self.tokens[self.cursor]
         except IndexError:
             return None
+
+    def error(self, message: str) -> ParseError:
+        raise ParseError
+
+    def parse(self) -> Tuple[bool, Optional[Expr]]:
+        # for token in self.tokens:
+        #     print(token)
+        try:
+            return False, (
+                None
+                if self.current_token.type is ValidTokenType.EOF
+                else self.expression()
+            )
+        except ParseError:
+            return True, None
 
     def expression(self) -> Expr:
         return self.equality()
@@ -77,7 +96,7 @@ class Parser:
         return expr
 
     def unary(self) -> Expr:
-        if self.current_token.type in [
+        if self.current_token and self.current_token.type in [
             ValidTokenType.BANG,
             ValidTokenType.MINUS,
         ]:
@@ -104,7 +123,9 @@ class Parser:
                 if self.current_token.type is ValidTokenType.RIGHT_PAREN:
                     expr = Grouping(expr)
                 else:
-                    raise Exception("Expect ')' after for clauses.")
+                    self.error("Expect ')' after for clauses.")
+            case _:
+                self.error("Expect expression.")
 
         self.cursor += 1
         return expr
