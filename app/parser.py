@@ -20,6 +20,11 @@ class Parser:
             return None
 
     def error(self, message: str) -> ParseError:
+        # token = self.current_token
+        # if token is ValidTokenType.EOF:
+        #     print(f"[line {token.line}] Error at '{token.lexeme}': {message}")
+        # else:
+        #     print(f"[line {token.line}] Error at end: {message}")
         raise ParseError
 
     def parse(self) -> Tuple[bool, Optional[Expr]]:
@@ -114,7 +119,7 @@ class Parser:
             case ValidTokenType.TRUE:
                 expr = Literal("true")
             case ValidTokenType.NIL:
-                expr = Literal(None)
+                expr = Literal("nil")
             case ValidTokenType.NUMBER | ValidTokenType.STRING:
                 expr = Literal(self.current_token.literal)
             case ValidTokenType.LEFT_PAREN:

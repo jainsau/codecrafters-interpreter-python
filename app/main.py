@@ -3,6 +3,7 @@ import argparse
 from app.scanner import Scanner
 from app.parser import Parser
 from app.ast_printer import AstPrinter
+from app.interpreter import Interpreter
 
 
 def main():
@@ -10,7 +11,9 @@ def main():
     ap = argparse.ArgumentParser(description="Lox parser")
 
     # Add arguments
-    ap.add_argument("command", choices=["tokenize", "parse"], help="Command")
+    ap.add_argument(
+        "command", choices=["tokenize", "parse", "evaluate"], help="Command"
+    )
     ap.add_argument("filename", type=str, help="Sourcefile")
 
     # Parse arguments
@@ -20,20 +23,21 @@ def main():
         file_contents = file.read()
 
     if file_contents:
-        s = Scanner(file_contents)
-        tokens, errors = s.tokens
+        tokens, errors = Scanner(file_contents).tokens
+        had_error, expr = Parser(tokens).parse()
+
         if args.command == "tokenize":
             for token in tokens:
                 print(token)
             for error in errors:
                 print(error, file=sys.stderr)
-        else:
-            p = Parser(tokens)
-            had_error, expr = p.parse()
+        elif args.command == "parse":
             if had_error:
                 exit(65)
             if expr:
                 print(AstPrinter().print(expr))
+        else:
+            print(Interpreter().evaluate(expr))
         if errors:
             exit(65)
     else:
