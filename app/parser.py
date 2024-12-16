@@ -28,8 +28,6 @@ class Parser:
         raise ParseError
 
     def parse(self) -> Tuple[bool, Optional[Expr]]:
-        # for token in self.tokens:
-        #     print(token)
         try:
             return False, (
                 None
@@ -113,15 +111,17 @@ class Parser:
         return self.primary()
 
     def primary(self) -> Expr:
-        match self.current_token.type:
-            case ValidTokenType.FALSE:
-                expr = Literal("false")
-            case ValidTokenType.TRUE:
-                expr = Literal("true")
-            case ValidTokenType.NIL:
-                expr = Literal("nil")
-            case ValidTokenType.NUMBER | ValidTokenType.STRING:
-                expr = Literal(self.current_token.literal)
+        token = self.current_token
+        match token.type:
+            case (
+                ValidTokenType.FALSE
+                | ValidTokenType.TRUE
+                | ValidTokenType.NIL
+                | ValidTokenType.FLOAT
+                | ValidTokenType.INTEGER
+                | ValidTokenType.STRING
+            ):
+                expr = Literal(token)
             case ValidTokenType.LEFT_PAREN:
                 self.cursor += 1
                 expr = self.expression()

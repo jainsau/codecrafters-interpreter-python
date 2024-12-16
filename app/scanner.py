@@ -28,7 +28,8 @@ class ValidTokenType(Enum):
     # Literals
     IDENTIFIER = auto()
     STRING = auto()
-    NUMBER = auto()
+    INTEGER = auto()
+    FLOAT = auto()
     # Keywords
     AND = auto()
     CLASS = auto()
@@ -69,9 +70,7 @@ class ValidToken:
         self.line = line
 
     def __str__(self):
-        return (
-            f"{self.type.name} {self.lexeme} {self.literal if self.literal else 'null'}"
-        )
+        return f"{self.type.name if self.type not in [ValidTokenType.INTEGER, ValidTokenType.FLOAT] else 'NUMBER'} {self.lexeme} {self.literal if self.literal else 'null'}"
 
 
 class WhiteToken:
@@ -165,15 +164,23 @@ class Scanner:
                     # match strings
                     t = m.group()
                     token = ValidToken(ValidTokenType.STRING, t, m.group(1), line)
-                case _ if (m := re.match(r"([\d]+)\.?([\d]*)", buffer)):
+                case _ if (m := re.match(r"([\d]+)(\.([\d]*))?", buffer)):
+                    # NB: The below is simply a workaround the accomodate the
+                    # incoinsistent design choice made by the author of the
+                    # lox language in the representation of integers between the parser and the evaluator
+                    # REF: https://forum.codecrafters.io/t/mutually-contradictory-test-cases-for-ht8-vs-lv1/3475
                     # match number literals
                     # handle trailing zeros sensibly
                     t = m.group()
-                    if (fraction := re.sub(r"0+$", r"", f"{m.group(2)}")) == "":
-                        fraction = "0"
-                    token = ValidToken(
-                        ValidTokenType.NUMBER, t, f"{m.group(1)}.{fraction}", line
-                    )
+                    if m.group(3):
+                        fraction = re.sub(r"0+$", r"0", f"{m.group(3)}")
+                        token = ValidToken(
+                            ValidTokenType.FLOAT, t, f"{m.group(1)}.{fraction}", line
+                        )
+                    else:
+                        token = ValidToken(
+                            ValidTokenType.INTEGER, t, f"{m.group(0)}.0", line
+                        )
                 case _ if (m := re.match(r"[A-z_][\w]*", buffer)):
                     # match keywords and identifiers
                     t = m.group()
