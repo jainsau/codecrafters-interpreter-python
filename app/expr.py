@@ -1,4 +1,5 @@
 from .scanner import ValidToken
+from typing import List
 import abc
 from typing import TypeVar, Protocol
 
@@ -12,6 +13,8 @@ class Expr(abc.ABC):
 
 
 class Visitor(Protocol[T]):
+    def visit_binary_expr(self, expr: "Binary") -> T: ...
+
     def visit_grouping_expr(self, expr: "Grouping") -> T: ...
 
     def visit_literal_expr(self, expr: "Literal") -> T: ...
@@ -36,7 +39,7 @@ class Grouping(Expr):
 
 
 class Literal(Expr):
-    def __init__(self, value: object):
+    def __init__(self, value: ValidToken):
         self.value = value
 
     def accept(self, visitor: Visitor[T]) -> T:

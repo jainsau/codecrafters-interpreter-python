@@ -164,7 +164,7 @@ class Scanner:
                     # match strings
                     t = m.group()
                     token = ValidToken(ValidTokenType.STRING, t, m.group(1), line)
-                case _ if (m := re.match(r"([\d]+)(\.([\d]*))?", buffer)):
+                case _ if (m := re.match(r"\d+(\.?\d*)?", buffer)):
                     # NB: The below is simply a workaround the accomodate the
                     # incoinsistent design choice made by the author of the
                     # lox language in the representation of integers between the parser and the evaluator
@@ -172,15 +172,14 @@ class Scanner:
                     # match number literals
                     # handle trailing zeros sensibly
                     t = m.group()
-                    if m.group(3):
-                        fraction = re.sub(r"0+$", r"0", f"{m.group(3)}")
-                        token = ValidToken(
-                            ValidTokenType.FLOAT, t, f"{m.group(1)}.{fraction}", line
-                        )
-                    else:
+                    if m.group(1) == "":
                         token = ValidToken(
                             ValidTokenType.INTEGER, t, f"{m.group(0)}.0", line
                         )
+                    else:
+                        literal = re.sub(r"0+$", r"", t)
+                        literal = re.sub(r"\.$", r".0", literal)
+                        token = ValidToken(ValidTokenType.FLOAT, t, literal, line)
                 case _ if (m := re.match(r"[A-z_][\w]*", buffer)):
                     # match keywords and identifiers
                     t = m.group()
