@@ -44,6 +44,8 @@ def main():
                 print("true")
             elif o is False:
                 print("false")
+            elif type(o) is float:
+                print(f"{int(o) if int(o)==o else o}")
             else:
                 print(o)
         if errors:

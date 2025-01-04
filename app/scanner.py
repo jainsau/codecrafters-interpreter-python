@@ -169,14 +169,14 @@ class Scanner:
                     # incoinsistent design choice made by the author of the
                     # lox language in the representation of integers between the parser and the evaluator
                     # REF: https://forum.codecrafters.io/t/mutually-contradictory-test-cases-for-ht8-vs-lv1/3475
-                    # match number literals
-                    # handle trailing zeros sensibly
                     t = m.group()
                     if m.group(1) == "":
                         token = ValidToken(
                             ValidTokenType.INTEGER, t, f"{m.group(0)}.0", line
                         )
                     else:
+                        # match number literals
+                        # handle trailing zeros sensibly
                         literal = re.sub(r"0+$", r"", t)
                         literal = re.sub(r"\.$", r".0", literal)
                         token = ValidToken(ValidTokenType.FLOAT, t, literal, line)

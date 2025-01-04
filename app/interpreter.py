@@ -1,4 +1,4 @@
-from .expr import Visitor, Expr, Grouping, Unary, Literal
+from .expr import Visitor, Expr, Grouping, Binary, Unary, Literal
 from .scanner import ValidTokenType
 
 
@@ -37,3 +37,13 @@ class Interpreter(Visitor):
                 return -right
             case ValidTokenType.BANG:
                 return not self.is_truthy(right)
+
+    def visit_binary_expr(self, expr: Binary) -> str:
+        left = self.evaluate(expr.left)
+        right = self.evaluate(expr.right)
+
+        match expr.operator.type:
+            case ValidTokenType.SLASH:
+                return left / right
+            case ValidTokenType.STAR:
+                return left * right
