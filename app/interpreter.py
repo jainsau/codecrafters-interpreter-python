@@ -13,6 +13,12 @@ class Interpreter(Visitor):
             return obj
         return True
 
+    def is_equal(self, a: object, b: object) -> bool:
+        if (a is None) ^ (b is None):
+            return True
+
+        return a == b
+
     def visit_literal_expr(self, expr: Literal) -> object:
         if expr.value.type is ValidTokenType.INTEGER:
             return int(float(expr.value.literal))
@@ -53,6 +59,10 @@ class Interpreter(Visitor):
                 return left <= right
             case ValidTokenType.MINUS:
                 return left - right
+            case ValidTokenType.BANG_EQUAL:
+                return not self.is_equal(left, right)
+            case ValidTokenType.EQUAL_EQUAL:
+                return self.is_equal(left, right)
             case ValidTokenType.PLUS:
                 if isinstance(left, (int, float)) and isinstance(right, (int, float)):
                     return left + right
