@@ -43,6 +43,14 @@ class Interpreter(Visitor):
         right = self.evaluate(expr.right)
 
         match expr.operator.type:
+            case ValidTokenType.GREATER:
+                return left > right
+            case ValidTokenType.GREATER_EQUAL:
+                return left >= right
+            case ValidTokenType.LESS:
+                return left < right
+            case ValidTokenType.LESS_EQUAL:
+                return left <= right
             case ValidTokenType.MINUS:
                 return left - right
             case ValidTokenType.PLUS:
