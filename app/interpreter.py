@@ -43,6 +43,13 @@ class Interpreter(Visitor):
         right = self.evaluate(expr.right)
 
         match expr.operator.type:
+            case ValidTokenType.MINUS:
+                return left - right
+            case ValidTokenType.PLUS:
+                if isinstance(left, (int, float)) and isinstance(right, (int, float)):
+                    return left + right
+                elif isinstance(left, str) and isinstance(right, str):
+                    return left + right
             case ValidTokenType.SLASH:
                 return left / right
             case ValidTokenType.STAR:
