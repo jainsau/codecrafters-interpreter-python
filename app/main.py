@@ -37,7 +37,15 @@ def main():
             if expr:
                 print(AstPrinter().print(expr))
         else:
-            print(Interpreter().evaluate(expr))
+            o = Interpreter().evaluate(expr)
+            if o is None:
+                print("nil")
+            elif o is True:
+                print("true")
+            elif o is False:
+                print("false")
+            else:
+                print(o)
         if errors:
             exit(65)
     else:
