@@ -35,10 +35,22 @@ class Interpreter(Visitor):
             return obj
         return True
 
+    def is_number(self, value: object) -> None:
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            return False
+        return True
+
     def check_number_operand(self, operator: ValidToken, operand: object) -> None:
-        if isinstance(operand, bool) or not isinstance(operand, (int, float)):
-            raise RuntimeError_(operator, "Operand must be a number.")
-        return
+        if self.is_number(operand):
+            return
+        raise RuntimeError_(operator, "Operand must be a number.")
+
+    def check_number_operands(
+        self, operator: ValidToken, left: object, right: object
+    ) -> None:
+        if self.is_number(left) and self.is_number(right):
+            return
+        raise RuntimeError_(operator, "Operands must be a numbers.")
 
     def is_equal(self, a: object, b: object) -> bool:
         if (a is None) ^ (b is None):
@@ -97,6 +109,8 @@ class Interpreter(Visitor):
                 elif isinstance(left, str) and isinstance(right, str):
                     return left + right
             case ValidTokenType.SLASH:
+                self.check_number_operands(expr.operator, left, right)
                 return left / right
             case ValidTokenType.STAR:
+                self.check_number_operands(expr.operator, left, right)
                 return left * right
