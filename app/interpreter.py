@@ -98,16 +98,17 @@ class Interpreter(Visitor):
             case ValidTokenType.LESS_EQUAL:
                 return left <= right
             case ValidTokenType.MINUS:
+                self.check_number_operands(expr.operator, left, right)
                 return left - right
             case ValidTokenType.BANG_EQUAL:
                 return not self.is_equal(left, right)
             case ValidTokenType.EQUAL_EQUAL:
                 return self.is_equal(left, right)
             case ValidTokenType.PLUS:
-                if isinstance(left, (int, float)) and isinstance(right, (int, float)):
+                if isinstance(left, str) and isinstance(right, str):
                     return left + right
-                elif isinstance(left, str) and isinstance(right, str):
-                    return left + right
+                self.check_number_operands(expr.operator, left, right)
+                return left + right
             case ValidTokenType.SLASH:
                 self.check_number_operands(expr.operator, left, right)
                 return left / right
