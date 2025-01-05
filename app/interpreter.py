@@ -90,12 +90,16 @@ class Interpreter(Visitor):
 
         match expr.operator.type:
             case ValidTokenType.GREATER:
+                self.check_number_operands(expr.operator, left, right)
                 return left > right
             case ValidTokenType.GREATER_EQUAL:
+                self.check_number_operands(expr.operator, left, right)
                 return left >= right
             case ValidTokenType.LESS:
+                self.check_number_operands(expr.operator, left, right)
                 return left < right
             case ValidTokenType.LESS_EQUAL:
+                self.check_number_operands(expr.operator, left, right)
                 return left <= right
             case ValidTokenType.MINUS:
                 self.check_number_operands(expr.operator, left, right)
