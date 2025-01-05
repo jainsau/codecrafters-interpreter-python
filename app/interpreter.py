@@ -1,8 +1,30 @@
 from .expr import Visitor, Expr, Grouping, Binary, Unary, Literal
-from .scanner import ValidTokenType
+from .scanner import ValidToken, ValidTokenType
+from .runtime_error import RuntimeError_
+import sys
 
 
 class Interpreter(Visitor):
+    def interpret(self, expr: Expr) -> None:
+        try:
+            value = self.evaluate(expr)
+            print(self.stringify(value))
+        except RuntimeError_ as e:
+            print(f"{e.args[0]}\n[line {e.token.line}]", file=sys.stderr)
+            exit(70)
+
+    def stringify(self, value: object) -> str:
+        if value is None:
+            return "nil"
+        elif value is True:
+            return "true"
+        elif value is False:
+            return "false"
+        elif type(value) is float:
+            return f"{int(value) if int(value) == value else value}"
+        else:
+            return value
+
     def evaluate(self, expr: Expr) -> object:
         return expr.accept(self)
 
@@ -12,6 +34,11 @@ class Interpreter(Visitor):
         elif isinstance(obj, bool):
             return obj
         return True
+
+    def check_number_operand(self, operator: ValidToken, operand: object) -> None:
+        if isinstance(operand, bool) or not isinstance(operand, (int, float)):
+            raise RuntimeError_(operator, "Operand must be a number.")
+        return
 
     def is_equal(self, a: object, b: object) -> bool:
         if (a is None) ^ (b is None):
@@ -40,6 +67,7 @@ class Interpreter(Visitor):
 
         match expr.operator.type:
             case ValidTokenType.MINUS:
+                self.check_number_operand(expr.operator, right)
                 return -right
             case ValidTokenType.BANG:
                 return not self.is_truthy(right)

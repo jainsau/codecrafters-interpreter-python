@@ -37,17 +37,7 @@ def main():
             if expr:
                 print(AstPrinter().print(expr))
         else:
-            o = Interpreter().evaluate(expr)
-            if o is None:
-                print("nil")
-            elif o is True:
-                print("true")
-            elif o is False:
-                print("false")
-            elif type(o) is float:
-                print(f"{int(o) if int(o)==o else o}")
-            else:
-                print(o)
+            Interpreter().interpret(expr)
         if errors:
             exit(65)
     else:
