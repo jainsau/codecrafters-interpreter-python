@@ -1,6 +1,7 @@
 import re
 from enum import Enum, auto
-from typing import Tuple, List
+from typing import List
+from app import lox
 
 
 class ValidTokenType(Enum):
@@ -47,7 +48,7 @@ class ValidTokenType(Enum):
     TRUE = auto()
     VAR = auto()
     WHILE = auto()
-    # Convenience
+    # End of File
     EOF = auto()
 
 
@@ -94,16 +95,10 @@ class ErrorToken:
 class Scanner:
     def __init__(self, buffer: str):
         self.buffer = buffer
-        self._tokens: List[ValidToken] = []
+        self.tokens: List[ValidToken] = []
         self._whites: List[WhiteToken] = []
-        self._errors: List[ErrorToken] = []
 
-    @property
-    def tokens(self) -> Tuple[List[ValidToken], List[ErrorToken]]:
-        self._scan()
-        return self._tokens, self._errors
-
-    def _scan(self) -> None:
+    def scan(self) -> List[ValidToken]:
         i, line = 0, 1
         while i < len(self.buffer):
             buffer = self.buffer[i:]
@@ -225,22 +220,22 @@ class Scanner:
                 case _ if (m := re.match(r"\"[^\"\n]*", buffer)):
                     # match unbalanced strings (error)
                     t = m.group()
+                    lox.Lox.error1(line, "Unterminated string.")
                     token = ErrorToken(
                         ErrorTokenType.UNTERM_STR, t, "Unterminated string.", line
                     )
                 case _:
                     t = buffer[0]
+                    lox.Lox.error1(line, f"Unexpected character: {t}")
                     token = ErrorToken(
                         ErrorTokenType.UNEXP_CHAR, t, f"Unexpected character: {t}", line
                     )
 
             if token.type in ValidTokenType:
-                self._tokens.append(token)
-            elif token.type in ErrorTokenType:
-                self._errors.append(token)
-            else:
-                self._whites.append(token)
+                self.tokens.append(token)
 
             i += len(token.lexeme)
 
-        self._tokens.append(ValidToken(ValidTokenType.EOF, "", None, line))
+        self.tokens.append(ValidToken(ValidTokenType.EOF, "", None, line))
+
+        return self.tokens

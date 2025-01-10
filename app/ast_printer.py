@@ -1,5 +1,5 @@
-from .expr import (
-    Visitor,
+from app.expr import (
+    ExprVisitor,
     Expr,
     Binary,
     Grouping,
@@ -9,7 +9,7 @@ from .expr import (
 from typing import List
 
 
-class AstPrinter(Visitor):
+class AstPrinter(ExprVisitor):
     def print(self, expr: Expr) -> str:
         return expr.accept(self)
 

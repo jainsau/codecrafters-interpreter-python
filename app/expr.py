@@ -6,12 +6,7 @@ from typing import TypeVar, Protocol
 T = TypeVar("T")
 
 
-class Expr(abc.ABC):
-    @abc.abstractmethod
-    def accept(self, visitor: "Visitor[T]") -> T: ...
-
-
-class Visitor(Protocol[T]):
+class ExprVisitor(Protocol[T]):
     def visit_binary_expr(self, expr: "Binary") -> T: ...
 
     def visit_grouping_expr(self, expr: "Grouping") -> T: ...
@@ -19,11 +14,16 @@ class Visitor(Protocol[T]):
     def visit_literal_expr(self, expr: "Literal") -> T: ...
 
 
+class Expr(abc.ABC):
+    @abc.abstractmethod
+    def accept(self, visitor: "ExprVisitor[T]") -> T: ...
+
+
 class Grouping(Expr):
     def __init__(self, expression: Expr):
         self.expression = expression
 
-    def accept(self, visitor: Visitor[T]) -> T:
+    def accept(self, visitor: ExprVisitor[T]) -> T:
         return visitor.visit_grouping_expr(self)
 
 
@@ -33,7 +33,7 @@ class Binary(Expr):
         self.operator = operator
         self.right = right
 
-    def accept(self, visitor: Visitor[T]) -> T:
+    def accept(self, visitor: ExprVisitor[T]) -> T:
         return visitor.visit_binary_expr(self)
 
 
@@ -41,7 +41,7 @@ class Literal(Expr):
     def __init__(self, value: ValidToken):
         self.value = value
 
-    def accept(self, visitor: Visitor[T]) -> T:
+    def accept(self, visitor: ExprVisitor[T]) -> T:
         return visitor.visit_literal_expr(self)
 
 
@@ -50,5 +50,5 @@ class Unary(Expr):
         self.operator = operator
         self.right = right
 
-    def accept(self, visitor: Visitor[T]) -> T:
+    def accept(self, visitor: ExprVisitor[T]) -> T:
         return visitor.visit_unary_expr(self)

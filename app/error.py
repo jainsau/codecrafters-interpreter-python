@@ -1,4 +1,8 @@
-from .scanner import ValidTokenType
+from app.scanner import ValidTokenType
+
+
+class ParseError(RuntimeError):
+    pass
 
 
 class RuntimeError_(RuntimeError):

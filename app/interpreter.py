@@ -1,17 +1,25 @@
-from .expr import Visitor, Expr, Grouping, Binary, Unary, Literal
-from .scanner import ValidToken, ValidTokenType
-from .runtime_error import RuntimeError_
-import sys
+from app.expr import ExprVisitor, Expr, Grouping, Binary, Unary, Literal
+from app.stmt import StmtVisitor, Stmt, Expression, Print
+from app.scanner import ValidToken, ValidTokenType
+from app.error import RuntimeError_
+from app import lox
+from typing import List
 
 
-class Interpreter(Visitor):
-    def interpret(self, expr: Expr) -> None:
+class Interpreter(ExprVisitor, StmtVisitor):
+    def interpret_expr(self, expr: Expr) -> None:
         try:
             value = self.evaluate(expr)
             print(self.stringify(value))
-        except RuntimeError_ as e:
-            print(f"{e.args[0]}\n[line {e.token.line}]", file=sys.stderr)
-            exit(70)
+        except RuntimeError_ as error:
+            lox.Lox.runtime_error(error)
+
+    def interpret(self, statements: List[Stmt]) -> None:
+        try:
+            for statement in statements:
+                self.execute(statement)
+        except RuntimeError_ as error:
+            lox.Lox.runtime_error(error)
 
     def stringify(self, value: object) -> str:
         if value is None:
@@ -24,6 +32,9 @@ class Interpreter(Visitor):
             return f"{int(value) if int(value) == value else value}"
         else:
             return value
+
+    def execute(self, stmt: Stmt) -> None:
+        stmt.accept(self)
 
     def evaluate(self, expr: Expr) -> object:
         return expr.accept(self)
@@ -50,13 +61,20 @@ class Interpreter(Visitor):
     ) -> None:
         if self.is_number(left) and self.is_number(right):
             return
-        raise RuntimeError_(operator, "Operands must be a numbers.")
+        raise RuntimeError_(operator, "Operands must be numbers.")
 
     def is_equal(self, a: object, b: object) -> bool:
         if (a is None) ^ (b is None):
             return True
 
         return a == b
+
+    def visit_expression_stmt(self, stmt: Expression) -> None:
+        self.evaluate(stmt.expression)
+
+    def visit_print_stmt(self, stmt: Print) -> None:
+        value = self.evaluate(stmt.expression)
+        print(self.stringify(value))
 
     def visit_literal_expr(self, expr: Literal) -> object:
         if expr.value.type is ValidTokenType.INTEGER:
