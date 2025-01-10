@@ -24,7 +24,10 @@ class AstPrinter(ExprVisitor):
         return self._parenthesize("group", expr.expression)
 
     def visit_literal_expr(self, expr: Literal) -> str:
-        return expr.value.literal if expr.value.literal else expr.value.lexeme
+        if expr.value.literal is not None:
+            return expr.value.literal
+        else:
+            return expr.value.lexeme
 
     def visit_unary_expr(self, expr: Unary) -> str:
         return self._parenthesize(expr.operator.lexeme, expr.right)

@@ -71,7 +71,7 @@ class ValidToken:
         self.line = line
 
     def __str__(self):
-        return f"{self.type.name if self.type not in [ValidTokenType.INTEGER, ValidTokenType.FLOAT] else 'NUMBER'} {self.lexeme} {self.literal if self.literal else 'null'}"
+        return f"""{self.type.name if self.type not in [ValidTokenType.INTEGER, ValidTokenType.FLOAT] else 'NUMBER'} {self.lexeme} {self.literal if self.literal is not None else 'null'}"""
 
 
 class WhiteToken:

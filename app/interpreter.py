@@ -87,7 +87,10 @@ class Interpreter(ExprVisitor, StmtVisitor):
             return False
         elif expr.value.type is ValidTokenType.NIL:
             return None
-        return expr.value.literal if expr.value.literal else expr.value.lexeme
+        if expr.value.literal is not None:
+            return expr.value.literal
+        else:
+            return expr.value.lexeme
 
     def visit_grouping_expr(self, expr: Grouping) -> object:
         return self.evaluate(expr.expression)
