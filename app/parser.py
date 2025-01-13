@@ -1,8 +1,8 @@
 from app import lox
 from app.error import ParseError
-from app.expr import Expr, Binary, Unary, Literal, Grouping
+from app.expr import Expr, Binary, Unary, Literal, Grouping, Variable
 from app.scanner import ValidToken, ValidTokenType
-from app.stmt import Stmt, Print, Expression
+from app.stmt import Stmt, Print, Expression, Var
 from typing import List, Optional
 
 
@@ -41,7 +41,7 @@ class Parser:
     def advance(self) -> ValidToken:
         if not self.is_at_end():
             self.cursor += 1
-        self.previous()
+        return self.previous()
 
     def check(self, type_: ValidTokenType) -> bool:
         if self.is_at_end():
@@ -77,10 +77,22 @@ class Parser:
 
     def declaration(self) -> Stmt:
         try:
+            if self.match(ValidTokenType.VAR):
+                return self.var_declaration()
             return self.statement()
         except ParseError:
             self.synchronize()
             return None
+
+    def var_declaration(self) -> Stmt:
+        name = self.consume(ValidTokenType.IDENTIFIER, "Expect variable name.")
+
+        initializer = None
+        if self.match(ValidTokenType.EQUAL):
+            initializer = self.expression()
+
+        self.consume(ValidTokenType.SEMICOLON, "Expect ';' after variable declaration.")
+        return Var(name, initializer)
 
     def statement(self) -> Stmt:
         if self.match(ValidTokenType.PRINT):
@@ -170,14 +182,16 @@ class Parser:
 
     def primary(self) -> Expr:
         if self.match(
-            ValidTokenType.FALSE,
             ValidTokenType.TRUE,
+            ValidTokenType.FALSE,
             ValidTokenType.NIL,
             ValidTokenType.FLOAT,
             ValidTokenType.INTEGER,
             ValidTokenType.STRING,
         ):
             return Literal(self.previous())
+        if self.match(ValidTokenType.IDENTIFIER):
+            return Variable(self.previous())
         if self.match(ValidTokenType.LEFT_PAREN):
             expr = self.expression()
             self.consume(ValidTokenType.RIGHT_PAREN, "Expect ')' after for clauses.")

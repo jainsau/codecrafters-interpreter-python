@@ -1,12 +1,16 @@
-from app.expr import ExprVisitor, Expr, Grouping, Binary, Unary, Literal
-from app.stmt import StmtVisitor, Stmt, Expression, Print
+from app.expr import ExprVisitor, Expr, Grouping, Binary, Unary, Literal, Variable
+from app.stmt import StmtVisitor, Stmt, Expression, Print, Var
 from app.scanner import ValidToken, ValidTokenType
 from app.error import RuntimeError_
+from app.environment import Environment
 from app import lox
 from typing import List
 
 
 class Interpreter(ExprVisitor, StmtVisitor):
+    def __init__(self):
+        self._environment = Environment()
+
     def interpret_expr(self, expr: Expr) -> None:
         try:
             value = self.evaluate(expr)
@@ -76,6 +80,13 @@ class Interpreter(ExprVisitor, StmtVisitor):
         value = self.evaluate(stmt.expression)
         print(self.stringify(value))
 
+    def visit_var_stmt(self, stmt: Var) -> None:
+        value = None
+        if stmt.initializer is not None:
+            value = self.evaluate(stmt.initializer)
+
+        self._environment.define(stmt.name.lexeme, value)
+
     def visit_literal_expr(self, expr: Literal) -> object:
         if expr.value.type is ValidTokenType.INTEGER:
             return int(float(expr.value.literal))
@@ -104,6 +115,9 @@ class Interpreter(ExprVisitor, StmtVisitor):
                 return -right
             case ValidTokenType.BANG:
                 return not self.is_truthy(right)
+
+    def visit_variable_expr(self, expr: Variable) -> object:
+        return self._environment.get(expr.name)
 
     def visit_binary_expr(self, expr: Binary) -> str:
         left = self.evaluate(expr.left)

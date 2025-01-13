@@ -13,6 +13,10 @@ class ExprVisitor(Protocol[T]):
 
     def visit_literal_expr(self, expr: "Literal") -> T: ...
 
+    def visit_unary_expr(self, expr: "Unary") -> T: ...
+
+    def visit_var_expr(self, expr: "Variable") -> T: ...
+
 
 class Expr(abc.ABC):
     @abc.abstractmethod
@@ -52,3 +56,11 @@ class Unary(Expr):
 
     def accept(self, visitor: ExprVisitor[T]) -> T:
         return visitor.visit_unary_expr(self)
+
+
+class Variable(Expr):
+    def __init__(self, name: ValidToken):
+        self.name = name
+
+    def accept(self, visitor: ExprVisitor[T]) -> T:
+        return visitor.visit_variable_expr(self)
