@@ -1,6 +1,6 @@
 from app import lox
 from app.error import ParseError
-from app.expr import Expr, Binary, Unary, Literal, Grouping, Variable
+from app.expr import Expr, Assign, Binary, Unary, Literal, Grouping, Variable
 from app.scanner import ValidToken, ValidTokenType
 from app.stmt import Stmt, Print, Expression, Var
 from typing import List, Optional
@@ -18,7 +18,7 @@ class Parser:
         return ParseError()
 
     def synchronize(self) -> None:
-        self.advance()
+        _ = self.advance()
 
         while not self.is_at_end():
             if self.previous().type == ValidTokenType.SEMICOLON:
@@ -27,7 +27,7 @@ class Parser:
                 case ValidTokenType.PRINT:
                     return
 
-            self.advance()
+            _ = self.advance()
 
     def peek(self) -> ValidToken:
         return self.tokens[self.cursor]
@@ -51,7 +51,7 @@ class Parser:
     def match(self, *types: ValidTokenType) -> bool:
         for type_ in types:
             if self.check(type_):
-                self.advance()
+                _ = self.advance()
                 return True
 
         return False
@@ -113,7 +113,22 @@ class Parser:
         return Expression(expr)
 
     def expression(self) -> Expr:
-        return self.equality()
+        return self.assignment()
+
+    def assignment(self) -> Expr:
+        expr = self.equality()
+
+        if self.match(ValidTokenType.EQUAL):
+            equals = self.previous()
+            value = self.assignment()
+
+            if isinstance(expr, Variable):
+                name = expr.name
+                return Assign(name, value)
+
+            self.error(equals, "Invalid assignment target.")
+
+        return expr
 
     def equality(self) -> Expr:
         expr = self.comparison()

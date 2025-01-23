@@ -1,4 +1,13 @@
-from app.expr import ExprVisitor, Expr, Grouping, Binary, Unary, Literal, Variable
+from app.expr import (
+    ExprVisitor,
+    Expr,
+    Assign,
+    Grouping,
+    Binary,
+    Unary,
+    Literal,
+    Variable,
+)
 from app.stmt import StmtVisitor, Stmt, Expression, Print, Var
 from app.scanner import ValidToken, ValidTokenType
 from app.error import RuntimeError_
@@ -86,6 +95,11 @@ class Interpreter(ExprVisitor, StmtVisitor):
             value = self.evaluate(stmt.initializer)
 
         self._environment.define(stmt.name.lexeme, value)
+
+    def visit_assign_expr(self, expr: Assign):
+        value = self.evaluate(expr.value)
+        self._environment.assign(expr.name, value)
+        return value
 
     def visit_literal_expr(self, expr: Literal) -> object:
         if expr.value.type is ValidTokenType.INTEGER:

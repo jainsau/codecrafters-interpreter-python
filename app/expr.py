@@ -7,6 +7,8 @@ T = TypeVar("T")
 
 
 class ExprVisitor(Protocol[T]):
+    def visit_assign_expr(self, expr: "Assign") -> T: ...
+
     def visit_binary_expr(self, expr: "Binary") -> T: ...
 
     def visit_grouping_expr(self, expr: "Grouping") -> T: ...
@@ -23,12 +25,13 @@ class Expr(abc.ABC):
     def accept(self, visitor: "ExprVisitor[T]") -> T: ...
 
 
-class Grouping(Expr):
-    def __init__(self, expression: Expr):
-        self.expression = expression
+class Assign(Expr):
+    def __init__(self, name: ValidToken, value: Expr):
+        self.name = name
+        self.value = value
 
     def accept(self, visitor: ExprVisitor[T]) -> T:
-        return visitor.visit_grouping_expr(self)
+        return visitor.visit_assign_expr(self)
 
 
 class Binary(Expr):
@@ -39,6 +42,14 @@ class Binary(Expr):
 
     def accept(self, visitor: ExprVisitor[T]) -> T:
         return visitor.visit_binary_expr(self)
+
+
+class Grouping(Expr):
+    def __init__(self, expression: Expr):
+        self.expression = expression
+
+    def accept(self, visitor: ExprVisitor[T]) -> T:
+        return visitor.visit_grouping_expr(self)
 
 
 class Literal(Expr):
