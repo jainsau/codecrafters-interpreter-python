@@ -2,7 +2,7 @@ from app import lox
 from app.error import ParseError
 from app.expr import Expr, Assign, Binary, Unary, Literal, Grouping, Variable
 from app.scanner import ValidToken, ValidTokenType
-from app.stmt import Stmt, Print, Expression, Var
+from app.stmt import Stmt, Print, Block, Expression, Var
 from typing import List, Optional
 
 
@@ -97,8 +97,18 @@ class Parser:
     def statement(self) -> Stmt:
         if self.match(ValidTokenType.PRINT):
             return self.print_statement()
+        elif self.match(ValidTokenType.LEFT_BRACE):
+            return self.block()
+        else:
+            return self.expression_statement()
 
-        return self.expression_statement()
+    def block(self) -> Block:
+        statements = []
+        while not self.check(ValidTokenType.RIGHT_BRACE) and not self.is_at_end():
+            statements.append(self.declaration())
+
+        self.consume(ValidTokenType.RIGHT_BRACE, "Expect '}' after block.")
+        return Block(statements)
 
     def print_statement(self) -> Stmt:
         value = self.expression()

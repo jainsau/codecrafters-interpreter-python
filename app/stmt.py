@@ -1,8 +1,8 @@
 import abc
-from typing import TypeVar, Protocol
+from typing import Protocol, TypeVar
+
 from .expr import Expr
 from .scanner import ValidToken
-
 
 T = TypeVar("T")
 
@@ -26,6 +26,14 @@ class Print(Stmt):
 
     def accept(self, visitor: StmtVisitor[T]) -> T:
         return visitor.visit_print_stmt(self)
+
+
+class Block(Stmt):
+    def __init__(self, statements: list[Stmt]):
+        self.statements = statements
+
+    def accept(self, visitor: StmtVisitor[T]) -> T:
+        return visitor.visit_block_stmt(self)
 
 
 class Expression(Stmt):

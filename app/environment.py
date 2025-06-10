@@ -1,15 +1,19 @@
-from .scanner import ValidToken
 from .error import RuntimeError_
+from .scanner import ValidToken
+from typing import Optional
 
 
 class Environment:
-    def __init__(self):
+    def __init__(self, enclosing: Optional["Environment"] = None):
+        self.enclosing = enclosing
         self.values = dict()
 
     def get(self, name: ValidToken) -> object:
-        try:
+        if name.lexeme in self.values:
             return self.values[name.lexeme]
-        except KeyError:
+        elif self.enclosing:
+            return self.enclosing.get(name)
+        else:
             raise RuntimeError_(name, f"Undefined variable '{name.lexeme}'.")
 
     def define(self, name: str, value: object) -> None:
@@ -19,5 +23,8 @@ class Environment:
         if name.lexeme in self.values:
             self.values[name.lexeme] = value
             return
-
-        raise RuntimeError_(name, f"Undefined variable '{name.lexeme}'.")
+        elif self.enclosing:
+            self.enclosing.assign(name, value)
+            return
+        else:
+            raise RuntimeError_(name, f"Undefined variable '{name.lexeme}'.")

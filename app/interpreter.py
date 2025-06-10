@@ -1,19 +1,20 @@
+from typing import List
+
+from app import lox
+from app.environment import Environment
+from app.error import RuntimeError_
 from app.expr import (
-    ExprVisitor,
-    Expr,
     Assign,
-    Grouping,
     Binary,
-    Unary,
+    Expr,
+    ExprVisitor,
+    Grouping,
     Literal,
+    Unary,
     Variable,
 )
-from app.stmt import StmtVisitor, Stmt, Expression, Print, Var
 from app.scanner import ValidToken, ValidTokenType
-from app.error import RuntimeError_
-from app.environment import Environment
-from app import lox
-from typing import List
+from app.stmt import Block, Expression, Print, Stmt, StmtVisitor, Var
 
 
 class Interpreter(ExprVisitor, StmtVisitor):
@@ -88,6 +89,19 @@ class Interpreter(ExprVisitor, StmtVisitor):
     def visit_print_stmt(self, stmt: Print) -> None:
         value = self.evaluate(stmt.expression)
         print(self.stringify(value))
+
+    def visit_block_stmt(self, stmt: Block) -> None:
+        self.execute_block(stmt.statements, Environment(self._environment))
+
+    def execute_block(self, statements: List[Stmt], environment: Environment) -> None:
+        previous = self._environment
+        try:
+            self._environment = environment
+
+            for statement in statements:
+                self.execute(statement)
+        finally:
+            self._environment = previous
 
     def visit_var_stmt(self, stmt: Var) -> None:
         value = None
