@@ -1,3 +1,6 @@
+.DS_Store
+.direnv/
+flake.nix
 pyproject.toml
 poetry.lock
 *.lox

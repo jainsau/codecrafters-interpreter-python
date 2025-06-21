@@ -10,11 +10,12 @@ from app.expr import (
     ExprVisitor,
     Grouping,
     Literal,
+    Logical,
     Unary,
     Variable,
 )
 from app.scanner import ValidToken, ValidTokenType
-from app.stmt import Block, Expression, Print, Stmt, StmtVisitor, Var
+from app.stmt import Block, Expression, If, Print, Stmt, StmtVisitor, Var
 
 
 class Interpreter(ExprVisitor, StmtVisitor):
@@ -86,6 +87,14 @@ class Interpreter(ExprVisitor, StmtVisitor):
     def visit_expression_stmt(self, stmt: Expression) -> None:
         self.evaluate(stmt.expression)
 
+    def visit_if_stmt(self, stmt: If) -> None:
+        if self.is_truthy(self.evaluate(stmt.condition)):
+            self.execute(stmt.then_branch)
+        elif stmt.else_branch:
+            self.execute(stmt.else_branch)
+
+        return None
+
     def visit_print_stmt(self, stmt: Print) -> None:
         value = self.evaluate(stmt.expression)
         print(self.stringify(value))
@@ -130,6 +139,18 @@ class Interpreter(ExprVisitor, StmtVisitor):
             return expr.value.literal
         else:
             return expr.value.lexeme
+
+    def visit_logical_expr(self, expr: Logical) -> object:
+        left = self.evaluate(expr.left)
+
+        if expr.operator.type == ValidTokenType.OR:
+            if self.is_truthy(left):
+                return left
+        else:
+            if not self.is_truthy(left):
+                return left
+
+        return self.evaluate(expr.right)
 
     def visit_grouping_expr(self, expr: Grouping) -> object:
         return self.evaluate(expr.expression)
