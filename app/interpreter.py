@@ -15,7 +15,7 @@ from app.expr import (
     Variable,
 )
 from app.scanner import ValidToken, ValidTokenType
-from app.stmt import Block, Expression, If, Print, Stmt, StmtVisitor, Var
+from app.stmt import Block, Expression, If, Print, Stmt, StmtVisitor, Var, While
 
 
 class Interpreter(ExprVisitor, StmtVisitor):
@@ -93,14 +93,16 @@ class Interpreter(ExprVisitor, StmtVisitor):
         elif stmt.else_branch:
             self.execute(stmt.else_branch)
 
-        return None
-
     def visit_print_stmt(self, stmt: Print) -> None:
         value = self.evaluate(stmt.expression)
         print(self.stringify(value))
 
     def visit_block_stmt(self, stmt: Block) -> None:
         self.execute_block(stmt.statements, Environment(self._environment))
+
+    def visit_while_stmt(self, stmt: While) -> None:
+        while self.is_truthy(self.evaluate(stmt.condition)):
+            self.execute(stmt.body)
 
     def execute_block(self, statements: List[Stmt], environment: Environment) -> None:
         previous = self._environment

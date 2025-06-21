@@ -1,7 +1,7 @@
-from .scanner import ValidToken
 import abc
-from typing import TypeVar, Protocol
+from typing import Protocol, TypeVar
 
+from .scanner import ValidToken
 
 T = TypeVar("T")
 
@@ -15,9 +15,11 @@ class ExprVisitor(Protocol[T]):
 
     def visit_literal_expr(self, expr: "Literal") -> T: ...
 
+    def visit_logical_expr(self, expr: "Logical") -> T: ...
+
     def visit_unary_expr(self, expr: "Unary") -> T: ...
 
-    def visit_var_expr(self, expr: "Variable") -> T: ...
+    def visit_variable_expr(self, expr: "Variable") -> T: ...
 
 
 class Expr(abc.ABC):

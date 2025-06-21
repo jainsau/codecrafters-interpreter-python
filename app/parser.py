@@ -2,7 +2,7 @@ from app import lox
 from app.error import ParseError
 from app.expr import Expr, Assign, Binary, Logical, Unary, Literal, Grouping, Variable
 from app.scanner import ValidToken, ValidTokenType
-from app.stmt import Stmt, If, Print, Block, Expression, Var
+from app.stmt import Stmt, If, Print, Block, Expression, Var, While
 from typing import List, Optional
 
 
@@ -99,6 +99,8 @@ class Parser:
             return self.if_statement()
         elif self.match(ValidTokenType.PRINT):
             return self.print_statement()
+        elif self.match(ValidTokenType.WHILE):
+            return self.while_statement()
         elif self.match(ValidTokenType.LEFT_BRACE):
             return self.block()
         else:
@@ -128,6 +130,14 @@ class Parser:
         self.consume(ValidTokenType.SEMICOLON, "Expect ';' after value.")
 
         return Print(value)
+
+    def while_statement(self) -> Stmt:
+        self.consume(ValidTokenType.LEFT_PAREN, "Expect '(' after 'while'.")
+        condition = self.expression()
+        self.consume(ValidTokenType.RIGHT_PAREN, "Expect ')' after condition.")
+        body = self.statement()
+
+        return While(condition, body)
 
     def expression_statement(self) -> Stmt:
         expr = self.expression()

@@ -1,5 +1,5 @@
 import abc
-from typing import Protocol, TypeVar, Optional
+from typing import Optional, Protocol, TypeVar
 
 from .expr import Expr
 from .scanner import ValidToken
@@ -17,6 +17,8 @@ class StmtVisitor(Protocol[T]):
     def visit_expression_stmt(self, stmt: "Expression") -> T: ...
 
     def visit_var_stmt(self, stmt: "Var") -> T: ...
+
+    def visit_while_stmt(self, stmt: "While") -> T: ...
 
 
 class Stmt(abc.ABC):
@@ -65,3 +67,12 @@ class Var(Stmt):
 
     def accept(self, visitor: StmtVisitor[T]) -> T:
         return visitor.visit_var_stmt(self)
+
+
+class While(Stmt):
+    def __init__(self, condition: Expr, body: Stmt):
+        self.condition = condition
+        self.body = body
+
+    def accept(self, visitor: StmtVisitor[T]) -> T:
+        return visitor.visit_while_stmt(self)
