@@ -101,6 +101,8 @@ class Parser:
             return self.print_statement()
         elif self.match(ValidTokenType.WHILE):
             return self.while_statement()
+        elif self.match(ValidTokenType.FOR):
+            return self.for_statement()
         elif self.match(ValidTokenType.LEFT_BRACE):
             return self.block()
         else:
@@ -121,9 +123,8 @@ class Parser:
 
         then_branch = self.statement()
         else_branch = self.statement() if self.match(ValidTokenType.ELSE) else None
-        if_stmt = If(condition, then_branch, else_branch)
 
-        return if_stmt
+        return If(condition, then_branch, else_branch)
 
     def print_statement(self) -> Stmt:
         value = self.expression()
@@ -138,6 +139,38 @@ class Parser:
         body = self.statement()
 
         return While(condition, body)
+
+    def for_statement(self) -> Stmt:
+        self.consume(ValidTokenType.LEFT_PAREN, "Expect '(' after 'for'.")
+        if self.match(ValidTokenType.SEMICOLON):
+            initializer = None
+        elif self.match(ValidTokenType.VAR):
+            initializer = self.var_declaration()
+        else:
+            initializer = self.expression_statement()
+
+        condition = None
+        if not self.check(ValidTokenType.SEMICOLON):
+            condition = self.expression()
+        self.consume(ValidTokenType.SEMICOLON, "Expect ';' after loop condition.")
+
+        increment = None
+        if not self.check(ValidTokenType.RIGHT_PAREN):
+            increment = self.expression()
+        self.consume(ValidTokenType.RIGHT_PAREN, "Expect ')' after for clauses.")
+
+        body = self.statement()
+        if increment:
+            body = Block([body, Expression(increment)])
+
+        if condition is None:
+            condition = Literal(ValidToken(ValidTokenType.TRUE, "true", None, 1))
+        body = While(condition, body)
+
+        if initializer is not None:
+            body = Block([initializer, body])
+
+        return body
 
     def expression_statement(self) -> Stmt:
         expr = self.expression()
